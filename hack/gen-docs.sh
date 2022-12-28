@@ -8,7 +8,7 @@ echo "Running Helm-Docs"
 docker run --rm \
     -v "$CHART_DIR:/helm-docs" \
     -u $(id -u) \
-    jnorwood/helm-docs:v1.10.0
+    jnorwood/helm-docs:v1.11.0
 
 if [[ $(git diff --stat) != '' ]]; then
     echo -e '\033[0;31mDocumentation outdated!\033[0m ❌'
