@@ -20,3 +20,4 @@ docker run \
      --config .github/configs/ct-lint.yaml \
      --lint-conf .github/configs/lintconf.yaml \
      --debug
+     
