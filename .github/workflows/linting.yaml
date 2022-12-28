@@ -59,6 +59,7 @@ jobs:
       - name: Run docs-testing (helm-docs)
         id: helm-docs
         run: |
+          chmod +x ./hack/gen-docs.sh
           ./hack/gen-docs.sh
 
       
