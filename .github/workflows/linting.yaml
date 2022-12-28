@@ -1,78 +1,53 @@
-## Reference: https://github.com/helm/chart-testing-action
----
-name: Linting and Testing
-on:
-  push:
+name: Helm PR Workflow
 
-jobs: 
-  chart-test:
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  lint-test:
     runs-on: ubuntu-latest
+    name: Helm Chart Lint
+    env:
+      CT_CHART_DIRS: charts
+      CT_TARGET_BRANCH: $GITHUB_BASE_REF
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - uses: azure/setup-helm@v3
-      with:
-        version: 'v3.8.2' # default is latest (stable) test
-        token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
-      id: install
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
 
-      - name: Set up python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v2
         with:
-          python-version: 3.8
+          python-version: 3.7
 
-      - name: Setup Chart Linting
-        id: lint
-        uses: helm/chart-testing-action@v2.2.1
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.1.0
 
-      - name: List changed charts
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.8.2' # default is latest (stable) test
+          token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
+        id: install
+
+      - name: Run chart-testing (list-changed)
         id: list-changed
         run: |
-          ## If executed with debug this won't work anymore.
-          changed=$(ct --config ./.github/configs/ct-lint.yaml list-changed)
-          charts=$(echo "$changed" | tr '\n' ' ' | xargs)
+          changed=$(ct list-changed --target-branch $GITHUB_BASE_REF)
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
-            echo "::set-output name=changed_charts::$charts"
           fi
-      
-      # we will build and use this PR in the meantime
-      # ref: https://github.com/helm/chart-testing/pull/445
 
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '>=1.17.0'
-
-      - name: install custom chart-testing (ct CLI)
-        run: |
-          git clone -b ft-add-registry-support https://github.com/jcsf/chart-testing.git
-          cd chart-testing
-          go build -o /usr/local/bin/ct ct/main.go
-      
       - name: Run chart-testing (lint)
-        run: |
-          /usr/local/bin/ct lint --debug \
-            --config ./.github/configs/ct-lint.yaml \
-            --lint-conf ./.github/configs/lintconf.yaml \
-            --helm-repo-extra-args finx="--username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}"
-      
-      - name: Run docs-testing (helm-docs)
-        id: helm-docs
-        run: |
-          ./hack/gen-docs.sh
+        run: ct lint --target-branch $GITHUB_BASE_REF
 
-      # Skip testing for now since it doesn't support pulling chart from OCI registry yet.
-      # TODO: (tuananh-finx): wait til the PR lands and we can re-enable it.
+      - name: Create kind Kubernetes cluster
+        uses: helm/kind-action@v1.2.0
+        if: steps.list-changed.outputs.changed == 'true'
 
-      # - name: Create kind cluster
-      #   uses: helm/kind-action@v1.3.0
-      #   if: steps.list-changed.outputs.changed == 'true'
-      #   with:
-      #     config: .github/configs/kind-config.yaml
-
-      # - name: Run chart-testing (install)
-      #   run: ct install --config ./.github/configs/ct-install.yaml
-      #   if: steps.list-changed.outputs.changed == 'true'
+      - name: Run chart-testing (install)
+        run: ct install --target-branch $GITHUB_BASE_REF
