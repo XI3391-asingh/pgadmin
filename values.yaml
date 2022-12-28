@@ -1,0 +1,177 @@
+replicaCount: 1
+
+image:
+  registry: docker.io
+  repository: dpage/pgadmin4
+  tag: "6.18"
+  pullPolicy: IfNotPresent
+
+## Deployment annotations
+annotations: {}
+
+service:
+  type: ClusterIP
+  clusterIP: ""
+  loadBalancerIP: ""
+  port: 8080
+  targetPort: 80
+  # targetPort: 4181 To be used with a proxy extraContainer
+  portName: http
+  annotations: {}
+
+serviceAccount:
+  create: false
+  annotations: {}
+  name: ""
+
+networkPolicy:
+  enabled: true
+
+istio:
+  enabled: false
+  destinationRule:
+    enabled: false
+  gateway:
+    enabled: true
+    portName: http
+    portNumber: 80
+    protocol: HTTP
+    ingressHost: "*"
+  virtualService:
+    enabled: true
+    timeout: 1m
+    host: "*"
+    gateway: pgadmin
+    uriPrefix:
+    - /browser/
+    route:
+    - destination:
+      port:
+          number: 8080
+      host: pgadmin.pgadmin.svc.cluster.local
+  # authorization policy to only allow access within the namespace
+  authorizationPolicy:
+    enabled: false
+    allowedNaemspaces: []
+    # allowedNaemspaces: [ns1, ns2, ns3]
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+existingSecret: ""
+
+secretKeys:
+  pgadminPasswordKey: password
+
+env:
+  # can be email or nickname
+  email: abhi@domain.com
+  password: Abhi@101299
+  enhanced_cookie_protection: "False"
+
+  variables: []
+  # - name: PGADMIN_LISTEN_ADDRESS
+  #   value: "0.0.0.0"
+  # - name: PGADMIN_LISTEN_PORT
+  #   value: "8080"
+
+serverDefinitions:
+  ## If true, server definitions will be created
+  ##
+  enabled: false
+
+persistentVolume:
+  enabled: true
+  annotations: {}
+  ## pgAdmin4 Persistent Volume access modes
+  ## Must match those of existing PV or dynamic provisioner
+  ## Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+
+securityContext:
+  runAsUser: 5050
+  runAsGroup: 5050
+  fsGroup: 5050
+
+containerSecurityContext:
+  enabled: false
+  allowPrivilegeEscalation: false
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 15
+  successThreshold: 1
+  failureThreshold: 3
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 60
+  timeoutSeconds: 15
+  successThreshold: 1
+  failureThreshold: 3
+
+containerPorts:
+  http: 80
+
+resources: 
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+## Horizontal Pod Autoscaling
+## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+#
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+VolumePermissions:
+  ## If true, enables an InitContainer to set permissions on /var/lib/pgadmin.
+  ##
+  enabled: false
+
+nodeSelector: {}
+
+## Node tolerations for server scheduling to nodes with taints
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+##
+tolerations: []
+
+## Pod affinity
+##
+affinity: {}
+
+## Pod annotations
+##
+podAnnotations: {}
+
+## Pod labels
+##
+podLabels: {}
+  # key1: value1
+  # key2: value2
+
+init:
+  ## Init container resources
+  ##
+  resources: {}
+

@@ -1,0 +1,13 @@
+{{- if  and .Values.istio.enabled .Values.istio.destinationRule.enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "pgadmin.fullname" . }}-istio-mtls
+  labels:
+    {{- include "pgadmin.labels" . | nindent 4 }}
+spec:
+  host: {{ include "pgadmin.fullname" . }}.{{ include "app.namespace" . }}.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: {{ .Values.istio.destinationRule.mode }}
+{{- end }}
