@@ -28,8 +28,11 @@ jobs:
       - name: Set up chart-testing
         uses: helm/chart-testing-action@v2.1.0
 
-      - name: Add Helm Repo dependencies
-        run: helm repo add bitnami https://charts.bitnami.com/bitnami
+      - uses: azure/setup-helm@v3
+        with:
+          version: 'v3.8.2' # default is latest (stable) test
+          token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
+        id: install
 
       - name: Run chart-testing (list-changed)
         id: list-changed
