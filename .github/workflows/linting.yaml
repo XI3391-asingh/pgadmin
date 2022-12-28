@@ -63,16 +63,3 @@ jobs:
         id: helm-docs
         run: |
           ./hack/gen-docs.sh
-
-      # Skip testing for now since it doesn't support pulling chart from OCI registry yet.
-      # TODO: (tuananh-finx): wait til the PR lands and we can re-enable it.
-
-      # - name: Create kind cluster
-      #   uses: helm/kind-action@v1.3.0
-      #   if: steps.list-changed.outputs.changed == 'true'
-      #   with:
-      #     config: .github/configs/kind-config.yaml
-
-      # - name: Run chart-testing (install)
-      #   run: ct install --config ./.github/configs/ct-install.yaml
-      #   if: steps.list-changed.outputs.changed == 'true'
