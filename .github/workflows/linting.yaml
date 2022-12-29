@@ -67,6 +67,7 @@ jobs:
       - name: Run Helm-Docs
         run: |
             cd /tmp
+            chmod +x helm-docs
             helm-docs
             
       
