@@ -43,7 +43,7 @@ istio:
     host: "*"
     gateway: pgadmin
     uriPrefix:
-    - /browser/
+    - /
     route:
     - destination:
       port:
