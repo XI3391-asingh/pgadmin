@@ -62,6 +62,6 @@ jobs:
             cd /tmp
             wget https://github.com/norwoodj/helm-docs/releases/download/v1.11.0/helm-docs_1.11.0_Linux_armv6.tar.gz
             tar -xvf helm-docs_1.11.0_Linux_armv6.tar.gz
-            helm-docs
+            sudo mv helm-docs /usr/local/sbin
             
       
