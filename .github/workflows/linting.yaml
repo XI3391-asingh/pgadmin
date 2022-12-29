@@ -68,5 +68,9 @@ jobs:
         run: |
             cd /usr/local/sbin
             chmod +x helm-docs
+
+      - name: helm-docs
+        run: | 
+            helm-docs
             
       
