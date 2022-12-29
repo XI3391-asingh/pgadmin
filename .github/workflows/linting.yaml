@@ -56,12 +56,16 @@ jobs:
             --lint-conf ./.github/configs/lintconf.yaml \
             --helm-repo-extra-args finx="--username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }}"
       
-      - name: Run docs-testing (helm-docs)
+      - name: Install helm-docs
         id: helm-docs
         run: |
             cd /tmp
             wget https://github.com/norwoodj/helm-docs/releases/download/v1.11.0/helm-docs_1.11.0_Linux_armv6.tar.gz
             tar -xvf helm-docs_1.11.0_Linux_armv6.tar.gz
             sudo mv helm-docs /usr/local/sbin
-            helm-docs
+
+      - name: Run docs-testing (helm-docs)
+        run: |
+          helm-docs
+            
       
