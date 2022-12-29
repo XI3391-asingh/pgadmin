@@ -52,7 +52,7 @@ pgAdmin is a web based administration tool for the PostgreSQL database.
 | istio.virtualService.route[0].host | string | `"pgadmin.pgadmin.svc.cluster.local"` |  |
 | istio.virtualService.route[0].port.number | int | `8080` |  |
 | istio.virtualService.timeout | string | `"1m"` |  |
-| istio.virtualService.uriPrefix[0] | string | `"/browser/"` |  |
+| istio.virtualService.uriPrefix[0] | string | `"/"` |  |
 | livenessProbe.failureThreshold | int | `3` |  |
 | livenessProbe.initialDelaySeconds | int | `30` |  |
 | livenessProbe.periodSeconds | int | `60` |  |
