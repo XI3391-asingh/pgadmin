@@ -66,6 +66,6 @@ jobs:
 
       - name: Run docs-testing (helm-docs)
         run: |
-          helm-docs
+          /usr/local/sbin/helm-docs
             
       
