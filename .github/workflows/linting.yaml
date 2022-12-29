@@ -60,8 +60,9 @@ jobs:
         id: helm-docs
         run: |
             cd /tmp
-            wget https://github.com/norwoodj/helm-docs/releases/download/v${{ inputs.version }}/helm-docs_${{ inputs.version }}_Linux_x86_64.tar.gz
-            tar -xvf helm-docs_${{ inputs.version }}_Linux_x86_64.tar.gz
+            wget https://github.com/norwoodj/helm-docs/releases/download/v1.11.0/helm-docs_v1.11.0_Linux_x86_64.tar.gz
+            tar -xvf helm-docs_v1.11.0_Linux_x86_64.tar.gz
             sudo mv helm-docs /usr/local/sbin
+            helm-docs
 
       
